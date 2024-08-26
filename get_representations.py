@@ -78,8 +78,8 @@ def get_representations(mols, version, representation):
 
     return mols
 
-def save_representations():
-    return "Done"
+def save_representations(filename, rep_old, rep_new):
+    np.savez(filename, old=rep_old, new=rep_new)
 
 def main():
     #filename = "hof_qm7.txt"
@@ -92,46 +92,48 @@ def main():
     start = time()
     mols_old = get_representations(mols_old, "old", "CM")
     end = time()
-    print(f"CM old: {(end-start)/60.}")
+    print(f"CM old: {(end-start)/60.} min")
 
     start = time()
     mols_new = get_representations(mols_new, "new", "CM")
     end = time()
-    print(f"CM new: {(end-start)/60.}")
+    print(f"CM new: {(end-start)/60.} min")
 
     rep_old = np.array([mol.representation for mol in mols_old])
     rep_new = np.array([mol.representation for mol in mols_new])
 
     print(f"Rep diff: {np.mean(np.abs(rep_old-rep_new))}\n")
+    save_representations("CM.npz", rep_old, rep_new)
 
 
 
     start = time()
     mols_old = get_representations(mols_old, "old", "BoB")
     end = time()
-    print(f"BoB old: {(end-start)/60.}")
+    print(f"BoB old: {(end-start)/60.} min")
 
     start = time()
     mols_new = get_representations(mols_new, "new", "BoB")
     end = time()
-    print(f"BoB new: {(end-start)/60.}")
+    print(f"BoB new: {(end-start)/60.} min")
 
     rep_old = np.array([mol.representation for mol in mols_old])
     rep_new = np.array([mol.representation for mol in mols_new])
 
     print(f"Rep diff: {np.mean(np.abs(rep_old-rep_new))}\n")
+    save_representations("BoB.npz", rep_old, rep_new)
 
 
 
     start = time()
     mols_old = get_representations(mols_old, "old", "fchl19")
     end = time()
-    print(f"fchl19 old: {(end-start)/60.:.4f} sec")
+    print(f"fchl19 old: {(end-start)/60.:.4f} min")
 
     start = time()
     mols_new = get_representations(mols_new, "new", "fchl19")
     end = time()
-    print(f"fchl19 new: {(end-start)/60.:.4f} sec")
+    print(f"fchl19 new: {(end-start)/60.:.4f} min")
 
     rep_old = np.array([mol.representation for mol in mols_old])
     rep_new = np.array([mol.representation for mol in mols_new], dtype=object)
@@ -144,21 +146,23 @@ def main():
     reps_new = np.array(reps_new)
 
     print(f"Rep diff: {np.mean(np.abs(rep_old-reps_new))}\n")
+    save_representations("fchl19.npz", rep_old, rep_new)
 
     start = time()
     mols_old = get_representations(mols_old, "old", "SLATM")
     end = time()
-    print(f"SLATM old: {(end-start)/60.:.4f} sec")
+    print(f"SLATM old: {(end-start)/60.:.4f} min")
 
     start = time()
     mols_new = get_representations(mols_new, "new", "SLATM")
     end = time()
-    print(f"SLATM new: {(end-start)/60.:.4f} sec")
+    print(f"SLATM new: {(end-start)/60.:.4f} min")
 
     rep_old = np.array([mol.representation for mol in mols_old])
     rep_new = np.array([mol.representation for mol in mols_new])
 
     print(f"Rep diff: {np.mean(np.abs(rep_old-rep_new))}\n")
+    save_representations("SLATM.npz", rep_old, rep_new)
 
 
 
