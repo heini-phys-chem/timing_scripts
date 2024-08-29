@@ -75,6 +75,19 @@ def get_representations(mols, version, representation):
         for i, mol in enumerate(mols):
             mol.generate_slatm(mbtypes)
 
+    if representation == "FCHL19_forces":
+        if version == "old":
+            for i, mol in enumerate(mols):
+                rep, rep_f = generate_fchl_acsf(mol.nuclear_charges, mol.coordinates, gradients=True, pad=23, elements=[1, 6, 7, 8, 16])
+                mol.representation = rep_f
+        if version == "new":
+            for i, mol in enumerate(mols):
+                mol.generate_fchl19(gradients=True)
+            # List all functions in the class
+
+    if representation == "cMBDF":
+        for i, mol in enumerate(mols):
+            mol.generate_cmbdf(convolutions=[1, 6, 7, 8, 16])
 
     return mols
 
@@ -165,6 +178,33 @@ def main():
     save_representations("SLATM.npz", rep_old, rep_new)
 
 
+    mols_old = mols_old[:20]
+    mols_new = mols_new[:20]
+
+    start = time()
+    mols_old = get_representations(mols_old, "old", "FCHL19_forces")
+    end = time()
+    print(f"FCHL19 forces old: {(end-start)/60.:.4f} min")
+
+    start = time()
+    mols_new = get_representations(mols_new, "new", "FCHL19_forces")
+    end = time()
+    print(f"FCHL forces new: {(end-start)/60.:.4f} min")
+
+    rep_old = np.array([mol.representation for mol in mols_old], dtype=object)
+    rep_new = np.array([mol.grad_representation for mol in mols_new], dtype=object)
+
+    reps_new = []
+    for rep in rep_new:
+        rep_pad = np.zeros((23, 720, 23, 3))
+        orig_shape = rep.shape
+        rep_pad[:orig_shape[0], :, :orig_shape[2], :] = rep
+        reps_new.append(rep_pad)
+
+    reps_new = np.array(reps_new)
+
+    print(f"Rep diff: {np.mean(np.abs(rep_old-reps_new))}\n")
+    save_representations("FCHL19_forces.npz", rep_old, reps_new)
 
 
 
